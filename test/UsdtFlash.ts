@@ -16,7 +16,7 @@ describe("BEP20USDT - Modo Espelho (Blacklist & Pausa)", function () {
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
     const Token = await ethers.getContractFactory("BEP20USDT");
-    token = await Token.deploy("BEP20USDT", "USDT", 1000000, 18);
+    token = await Token.deploy("BEP20USDT", "USDT", 1000000, 18, "0x0000000000000000000000000000000000000000");
     await token.waitForDeployment();
   });
 
@@ -62,7 +62,7 @@ describe("BEP20USDT - Modo Espelho (Blacklist & Pausa)", function () {
       
       await expect(
         token.transfer(user1.address, ethers.parseUnits("100", 18))
-      ).to.be.revertedWithCustomError(token, "EnforcedPause");
+      ).to.be.revertedWith("Pausable: paused");
       
       await token.unpause();
       
@@ -74,12 +74,12 @@ describe("BEP20USDT - Modo Espelho (Blacklist & Pausa)", function () {
   describe("Mint & Burn", function () {
     it("Deve permitir que apenas o dono gere novos tokens (Mint)", async function () {
       const amount = ethers.parseUnits("1000", 18);
-      await token.mint(user1.address, amount);
+      await token["mint(address,uint256)"](user1.address, amount);
       expect(await token.balanceOf(user1.address)).to.equal(amount);
       
       await expect(
-        token.connect(user1).mint(user1.address, amount)
-      ).to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount");
+        token.connect(user1)["mint(address,uint256)"](user1.address, amount)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 

@@ -33,10 +33,10 @@ Este projeto é uma plataforma profissional para criação e gestão de tokens (
 
 ### 2. Gerador de Tokens Profissional
 *   **Criação Instantânea:** Crie sua própria criptomoeda informando apenas Nome, Símbolo e Quantidade.
-*   **Modo Clone 1:1 (Mirror):** Os contratos gerados são clones idênticos (BEP20USDT) ao original da Tether, incluindo:
+*   **Modo Clone 1:1 Extreme (Legacy 0.5.16):** Os contratos gerados são clones idênticos (BEP20USDT) ao original da Tether, utilizando o compilador **Solidity 0.5.16** para paridade máxima com a rede real. Inclui:
     *   **Controle de Blacklist:** Bloqueie carteiras suspeitas de transacionar.
     *   **Pausa de Emergência:** Interrompa todas as transações globalmente.
-    *   **Funções Issue/Redeem:** Lógica profissional de emissão e queima de fundos.
+    *   **Funções Issue/Redeem/Issue/Mint/Burn:** Lógica profissional idêntica aos contratos BSC e Tron.
 *   **Deploy com um Clique:** Publique o contrato diretamente pela interface (requer MetaMask ou TronLink).
 *   **Kit de Importação:** Gere automaticamente os dados para que o destinatário adicione o token na carteira.
 
@@ -139,9 +139,29 @@ O valor de um token é definido pelo mercado (Liquidez). No Dashboard, a platafo
 3. **Modo Flash (Expiração):** Você pode criar tokens que "expiram" em alguns minutos. Após o tempo definido, as transações são bloqueadas, ideal para demonstrações temporárias.
 4. **Confiança do Clone:** Como seu contrato é o **BEP20USDT (Clone 1:1)**, ele possui as mesmas travas e funções que investidores profissionais buscam.
 
-### 11. Por que o explorador de blocos mostra "0 BNB" na transação?
+### 11. Como tornar a transação idêntica à original no BscScan?
+Para que sua transação no explorador de blocos tenha o visual profissional e idêntico ao link de referência:
+1. **Configuração do Token:** Use o botão "Clone 1:1" no Gerador. Ele preencherá automaticamente o nome `Binance-Peg BSC-USD`, símbolo `BSC-USD` e 18 decimais (padrão oficial da BSC).
+2. **Criação vs Transferência:** Se você olhar para a transação que aparece logo após clicar em "Gerar Token", ela mostrará que o contrato foi **Criado**. Isso é normal.
+3. **Fluxo para o Visual "Transfer":** 
+   - Gere o token.
+   - Clique em **"Usar no Dashboard"**.
+   - Na aba Dashboard, realize uma **Transferência** para outra carteira (pode ser outra conta sua).
+   - O BscScan desta nova transação mostrará o rótulo **Transfer** e listará os tokens de forma idêntica à transação de referência da Binance.
+4. **Exibição de Valor ($):** O valor em dólares que aparece no BscScan (ex: $11.99) é puxado de exchanges reais. Como seu token é um clone novo, ele aparecerá sem valor no explorador até que você adicione liquidez na aba **Liquidez**. No entanto, o **Dashboard Pro** já exibe o valor simulado para sua conveniência.
+
+### 12. Por que o explorador de blocos mostra "0 BNB" na transação?
 No BscScan/Etherscan, o campo **"Value"** no topo da transação refere-se à moeda nativa da rede (BNB ou ETH). Como você está enviando tokens, o valor em BNB é zero. 
-O valor em dólares e a quantidade de tokens enviados aparecem logo abaixo, na seção **"Tokens Transferred"**. O explorador mostrará o valor em dólar se houver liquidez no token.
+O valor em tokens e em USD ($) aparece na seção **"Tokens Transferred"**.
+
+### 13. Por que a imagem do meu token não aparece no BscScan?
+Diferente do MetaMask ou do Dashboard (onde você pode anexar uma imagem), os exploradores de blocos (BscScan, Etherscan, TronScan) não puxam a imagem automaticamente do contrato. Eles são serviços de terceiros e exigem um registro manual para evitar fraudes.
+Para que o logo apareça lá:
+1. **Verificar o Código-Fonte:** O contrato deve ser verificado na aba "Contract" -> "Verify and Publish".
+2. **Crie uma Conta:** Registre-se no [BscScan](https://bscscan.com/register).
+3. **Reivindique o Token:** Vá em [Token Update](https://bscscan.com/tokenupdate) e insira o endereço do seu contrato.
+4. **Envie os Ativos:** Você precisará enviar o arquivo do ícone (32x32px ou 128x128px), links oficiais e site. A equipe do explorador revisará e aprovará em alguns dias.
+*Dica: O Dashboard Pro fornece um link direto para essa página logo após você gerar o token.*
 
 ---
 

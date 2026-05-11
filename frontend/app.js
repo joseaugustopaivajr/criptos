@@ -853,11 +853,49 @@ async function sendTokens() {
 }
 
 // Token Generator Logic
+async function cloneParentMetadata() {
+    const parentAddr = document.getElementById('gen-parent').value.trim();
+    if (!parentAddr || !ethers.isAddress(parentAddr)) return;
+
+    try {
+        const provider = await getProvider();
+        if (!provider) return;
+
+        showToast("Lendo metadados do contrato pai...", "info");
+        const tempContract = new ethers.Contract(parentAddr, [
+            "function name() view returns (string)",
+            "function symbol() view returns (string)",
+            "function decimals() view returns (uint8)",
+            "function totalSupply() view returns (uint256)"
+        ], provider);
+
+        const [name, symbol, decimals, total] = await Promise.all([
+            tempContract.name().catch(() => ""),
+            tempContract.symbol().catch(() => ""),
+            tempContract.decimals().catch(() => 18),
+            tempContract.totalSupply().catch(() => 0n)
+        ]);
+
+        if (name) document.getElementById('gen-name').value = name;
+        if (symbol) document.getElementById('gen-symbol').value = symbol;
+        if (decimals) document.getElementById('gen-decimals').value = Number(decimals);
+        if (total > 0n) {
+            document.getElementById('gen-supply').value = ethers.formatUnits(total, decimals);
+        }
+        
+        showToast("Metadados clonados com sucesso!", "success");
+    } catch (e) {
+        console.warn("Erro ao clonar metadados:", e);
+    }
+}
+
 async function deployNewToken() {
     const name = document.getElementById('gen-name').value.trim();
     const symbol = document.getElementById('gen-symbol').value.trim();
     const supply = document.getElementById('gen-supply').value;
     const decimals = document.getElementById('gen-decimals').value;
+    const parentContract = document.getElementById('gen-parent').value.trim() || "0x0000000000000000000000000000000000000000";
+    const image = document.getElementById('gen-image').value;
     const expiry = document.getElementById('gen-expiry').value || 0;
     const deployBtn = document.getElementById('deploy-token-button');
     const netKey = networkSelector.value;
@@ -917,7 +955,8 @@ async function deployNewToken() {
                     name,
                     symbol,
                     supply,
-                    decimals
+                    decimals,
+                    parentContract === "0x0000000000000000000000000000000000000000" ? "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb" : parentContract
                 ]
             };
 
@@ -928,8 +967,20 @@ async function deployNewToken() {
             if (broadcast.result) {
                 const newAddress = window.tronWeb.address.fromHex(broadcast.transaction.contract_address);
                 document.getElementById('new-token-address').innerText = newAddress;
+                
+                if (parentContract && parentContract !== "0x0000000000000000000000000000000000000000" && parentContract !== "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb") {
+                    document.getElementById('parent-contract-display').classList.remove('hidden');
+                    document.getElementById('new-token-parent').innerText = parentContract;
+                } else {
+                    document.getElementById('parent-contract-display').classList.add('hidden');
+                }
+
                 document.getElementById('new-token-owner').innerText = window.tronWeb.defaultAddress.base58;
                 document.getElementById('new-token-hash').innerText = broadcast.transaction.txID.substring(0, 20) + "...";
+                
+                // Link para Registro de Logo Tron
+                const updateLink = document.getElementById('explorer-token-update-link');
+                updateLink.href = "https://tronscan.org/#/token/token-verification";
                 
                 // Verifica saldo Tron imediato para feedback
                 try {
@@ -950,6 +1001,9 @@ async function deployNewToken() {
                 document.getElementById('deployment-result').classList.remove('hidden');
                 showStatus(`Token Tron ${symbol} gerado com sucesso!`, "success");
                 showToast("Sim! Os tokens foram enviados automaticamente para sua carteira.", "success");
+                if (image) {
+                    showToast("Nota: O logo aparecerá no Dashboard. No TronScan, requer registro manual.", "info");
+                }
             } else {
                 throw new Error("Falha ao transmitir transação na Tron.");
             }
@@ -997,7 +1051,8 @@ async function deployNewToken() {
             name, 
             symbol, 
             BigInt(supply), 
-            Number(decimals)
+            Number(decimals),
+            parentContract
         );
         
         showStatus("Deploy enviado! Aguardando mineração...", "info");
@@ -1034,12 +1089,34 @@ async function deployNewToken() {
 
         // Show Result
         document.getElementById('new-token-address').innerText = newAddress;
+        
+        if (parentContract && parentContract !== "0x0000000000000000000000000000000000000000") {
+            document.getElementById('parent-contract-display').classList.remove('hidden');
+            document.getElementById('new-token-parent').innerText = parentContract;
+        } else {
+            document.getElementById('parent-contract-display').classList.add('hidden');
+        }
+
         document.getElementById('new-token-owner').innerText = await currentSigner.getAddress();
         document.getElementById('new-token-hash').innerText = txHash.substring(0, 20) + "...";
         
         // Link para o explorador
         const explorerBase = NETWORKS[netKey]?.explorer || "https://bscscan.com/tx/";
         document.getElementById('new-token-hash').innerHTML = `<a href="${explorerBase}${txHash}" target="_blank" style="color: #3498db;">${txHash.substring(0, 20)}... <i class="fas fa-external-link-alt"></i></a>`;
+        
+        // Link para Registro de Logo
+        const updateLink = document.getElementById('explorer-token-update-link');
+        if (netKey === 'bsc') {
+            updateLink.href = "https://bscscan.com/tokenupdate";
+        } else if (netKey === 'eth' || netKey === 'sepolia') {
+            updateLink.href = "https://etherscan.io/tokenupdate";
+        } else {
+            updateLink.href = "#";
+        }
+        
+        // Alerta de Clone 1:1
+        showToast("Token Gerado com Sucesso! Clone 1:1 Extreme (Legacy 0.5.16) idêntico ao original.", "success");
+        showToast("Para valor no BscScan: Use a aba Liquidez para injetar valor real.", "info");
 
         // Verifica saldo do novo token para feedback imediato
         try {
@@ -1056,6 +1133,9 @@ async function deployNewToken() {
         document.getElementById('deployment-result').classList.remove('hidden');
         
         showStatus(`Token ${symbol} gerado com sucesso!`, "success");
+        if (image) {
+            showToast("Nota: O logo aparecerá no MetaMask/Dashboard. No BscScan, requer registro manual.", "info");
+        }
     } catch (error) {
         console.error("Erro detalhado no deploy:", error);
         // Captura o motivo do revert se disponível
@@ -1074,28 +1154,30 @@ function prefillGenerator() {
         document.getElementById('gen-name').value = "Binance-Peg BSC-USD";
         document.getElementById('gen-symbol').value = "BSC-USD";
         document.getElementById('gen-decimals').value = "18";
+        document.getElementById('gen-supply').value = "30000000"; // 30 Milhões como o original
     } else if (netKey === 'eth') {
         document.getElementById('gen-name').value = "Tether USD";
         document.getElementById('gen-symbol').value = "USDT";
         document.getElementById('gen-decimals').value = "18";
+        document.getElementById('gen-supply').value = "30000000";
     } else if (isTron(netKey)) {
         document.getElementById('gen-name').value = "Tether USD";
         document.getElementById('gen-symbol').value = "USDT";
         document.getElementById('gen-decimals').value = "6";
+        document.getElementById('gen-supply').value = "30000000";
     } else {
         document.getElementById('gen-name').value = "BEP20USDT";
         document.getElementById('gen-symbol').value = "USDT";
         document.getElementById('gen-decimals').value = "18";
+        document.getElementById('gen-supply').value = "1000000";
     }
     
-    document.getElementById('gen-supply').value = "1000000";
-    document.getElementById('gen-decimals').value = "18";
     document.getElementById('gen-image').value = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png";
     
     const genTab = document.querySelector('[data-tab="generator"]');
     if (genTab) genTab.click();
     
-    showToast("Dados preenchidos para modo Clone 1:1!", "info");
+    showToast("Dados preenchidos para modo Clone 1:1 Extreme!", "info");
 }
 
 window.prefillGenerator = prefillGenerator;
@@ -1301,6 +1383,7 @@ window.addEventListener('load', () => {
     connectBtn.onclick = connectWallet;
     document.getElementById('send-button').onclick = sendTokens;
     document.getElementById('deploy-token-button').onclick = deployNewToken;
+    document.getElementById('gen-parent').onchange = cloneParentMetadata;
     document.getElementById('check-balance-btn').onclick = checkExternalBalance;
     document.getElementById('max-amount-btn').onclick = setMaxAmount;
     

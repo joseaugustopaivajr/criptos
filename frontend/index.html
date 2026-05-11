@@ -179,6 +179,11 @@
                         <div id="tron-gas-warning" class="info-banner hidden" style="margin-top: 10px; background: rgba(231, 76, 60, 0.1); border-left: 4px solid #e74c3c; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #ff7675;">
                             <i class="fas fa-exclamation-triangle"></i> <strong>Aviso Tron:</strong> Deploys nesta rede consomem entre 50 a 100 TRX (ou Energy). Certifique-se de ter saldo suficiente.
                         </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Endereço do Contrato Pai (Opcional - Clonar Metadados)</label>
+                            <input type="text" id="gen-parent" placeholder="0x... (Cole um contrato para clonar)">
+                            <p class="tip-small"><i class="fas fa-magic"></i> Se preenchido, os dados serão carregados automaticamente deste contrato.</p>
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Nome do Token</label>
@@ -226,16 +231,46 @@
                     <div id="deployment-result" class="hidden">
                         <h3><i class="fas fa-check-circle"></i> Token Gerado com Sucesso!</h3>
                         <div class="info-banner mirror-info" style="margin-bottom: 15px; background: rgba(46, 204, 113, 0.1); border-left: 4px solid #2ecc71; padding: 10px; border-radius: 4px; font-size: 0.85rem;">
-                            <i class="fas fa-check-double" style="color: #2ecc71;"></i> <strong>Status: Clone 1:1 Confirmado.</strong> Este contrato é funcionalmente idêntico ao original (Tether).
+                            <i class="fas fa-check-double" style="color: #2ecc71;"></i> <strong>Status: Clone 1:1 Extreme Confirmado.</strong> Este contrato é funcionalmente idêntico ao original (Tether).
                         </div>
                         <div class="result-details">
                             <p><strong>Endereço do Contrato:</strong> <span id="new-token-address">...</span></p>
+                            <p id="parent-contract-display" class="hidden"><strong>Contrato Pai (Origem):</strong> <span id="new-token-parent" style="font-size: 0.8rem; color: #3498db;">...</span></p>
                             <p><strong>Enviado para:</strong> <span id="new-token-owner" style="font-size: 0.85rem; color: #f1c40f;">...</span></p>
                             <p id="tron-deploy-tip" class="tip-small hidden" style="color: #3498db; margin-top: -10px; margin-bottom: 10px;">
                                 <i class="fas fa-info-circle"></i> Sim! Os tokens já estão na sua carteira. Basta copiar o endereço acima e importar no TronLink para vê-los.
                             </p>
                             <p><strong>Hash da Transação:</strong> <span id="new-token-hash">...</span></p>
-                            <p class="tip-small"><i class="fas fa-info-circle"></i> <strong>Nota:</strong> No explorador de blocos, o campo "Value" mostrará <b>0 BNB</b> (ou ETH). Isso é normal, pois essa é a taxa de transferência nativa. O valor em tokens está listado na aba "Tokens Transferred".</p>
+                            
+                            <!-- Dica de Paridade BscScan -->
+                            <div class="info-banner mirror-pro-tip" style="margin-top: 15px; margin-bottom: 15px; background: rgba(52, 152, 219, 0.1); border-left: 4px solid #3498db; padding: 15px; border-radius: 4px; font-size: 0.85rem;">
+                                <p style="margin-bottom: 10px; color: #fff;"><strong><i class="fas fa-magic"></i> Quer que a transação pareça idêntica à original?</strong></p>
+                                <p style="font-size: 0.8rem; color: #ddd; line-height: 1.4;">A transação acima é de <strong>Criação do Contrato</strong>. Para ver o rótulo "Transfer" no BscScan igual ao link de referência:</p>
+                                <ol style="margin-left: 20px; margin-top: 8px; font-size: 0.8rem; color: #ccc;">
+                                    <li>Clique em <strong>"Usar no Dashboard"</strong> abaixo.</li>
+                                    <li>Vá para a aba <strong>Dashboard</strong> principal.</li>
+                                    <li>Faça uma <strong>Transferência</strong> para qualquer outra carteira.</li>
+                                    <li>Verifique o Hash desta nova transação no explorador.</li>
+                                </ol>
+                            </div>
+
+                            <p class="tip-small"><i class="fas fa-info-circle"></i> <strong>Nota:</strong> No explorador de blocos, o campo "Value" mostrará <b>0 BNB</b>. Isso é normal. O valor em tokens e em USD ($) aparece na aba "Tokens Transferred".</p>
+                            
+                            <!-- Guia de Registro de Logo -->
+                            <div class="info-banner logo-guide-panel" style="margin-top: 15px; margin-bottom: 15px; background: rgba(155, 89, 182, 0.1); border-left: 4px solid #9b59b6; padding: 15px; border-radius: 4px; font-size: 0.85rem;">
+                                <p style="margin-bottom: 10px; color: #fff;"><strong><i class="fas fa-image"></i> Por que o Logo não aparece no BscScan/TronScan?</strong></p>
+                                <p style="font-size: 0.8rem; color: #ddd; line-height: 1.4;">Exploradores de blocos são sites independentes e <strong>não puxam o logo do contrato</strong> automaticamente. Para o logo aparecer lá:</p>
+                                <ul style="margin-left: 20px; margin-top: 8px; font-size: 0.8rem; color: #ccc;">
+                                    <li>Verifique o contrato na aba "Contract".</li>
+                                    <li>Crie uma conta no BscScan/TronScan.</li>
+                                    <li>Use a ferramenta <strong>"Token Update"</strong> para enviar seu logo.</li>
+                                </ul>
+                                <div style="margin-top: 10px;">
+                                    <a id="explorer-token-update-link" href="#" target="_blank" class="btn-outline btn-small" style="display: inline-block; padding: 5px 10px; text-decoration: none; font-size: 0.75rem;">Ir para Registro de Logo <i class="fas fa-external-link-alt"></i></a>
+                                </div>
+                            </div>
+
+                            <p class="tip-small"><i class="fas fa-image"></i> <strong>Imagem no BscScan:</strong> O logo não aparece automaticamente no explorador. Você deve verificar o contrato no site do BscScan e solicitar a atualização do perfil do token.</p>
                             <div class="result-actions">
                                 <button id="use-this-token" class="btn-primary btn-small">Usar no Dashboard</button>
                                 <button id="copy-new-token" class="btn-small">Copiar Endereço</button>
@@ -426,6 +461,17 @@
                         </button>
                         <p class="tip-small"><i class="fas fa-info-circle"></i> Você precisará de saldo (ETH ou BNB) para pagar a taxa de gás da rede.</p>
                     </div>
+
+                    <!-- Guia Permanente de Logos -->
+                    <div class="deployment-help-box" style="border-color: #9b59b6; background: rgba(155, 89, 182, 0.05); margin-top: 20px;">
+                        <h3><i class="fas fa-image"></i> Guia de Logo no BscScan / TronScan</h3>
+                        <p style="font-size: 0.85rem;">Seu logo aparece no Dashboard e no MetaMask, mas exploradores de blocos exigem registro manual.</p>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <a href="https://bscscan.com/tokenupdate" target="_blank" class="btn-outline btn-small" style="flex: 1; text-align: center; text-decoration: none;">Registro BscScan</a>
+                            <a href="https://tronscan.org/#/token/token-verification" target="_blank" class="btn-outline btn-small" style="flex: 1; text-align: center; text-decoration: none;">Registro TronScan</a>
+                        </div>
+                    </div>
+
                     <p class="tip">Nota: O contrato principal pode ser alterado nas configurações.</p>
                 </div>
             </section>

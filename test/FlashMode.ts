@@ -16,7 +16,7 @@ describe("BEP20USDT - Modo Flash (Expiração)", function () {
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
     const Token = await ethers.getContractFactory("BEP20USDT");
-    token = await Token.deploy("Tether USD", "USDT", 1000000, 18);
+    token = await Token.deploy("Tether USD", "USDT", 1000000, 18, "0x0000000000000000000000000000000000000000");
     await token.waitForDeployment();
   });
 

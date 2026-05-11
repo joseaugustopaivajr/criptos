@@ -12,11 +12,8 @@ export default defineConfig({
   ],
 
   solidity: {
-    profiles: {
-      default: {
-        version: "0.8.28",
-      },
-      production: {
+    compilers: [
+      {
         version: "0.8.28",
         settings: {
           optimizer: {
@@ -25,7 +22,16 @@ export default defineConfig({
           },
         },
       },
-    },
+      {
+        version: "0.5.16",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    ],
   },
 
   networks: {

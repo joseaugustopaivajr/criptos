@@ -19,7 +19,7 @@ async function main() {
         await ethers.getContractFactory("BEP20USDT");
 
     const token =
-        await Token.deploy("BEP20USDT", "USDT", 1000000, 18);
+        await Token.deploy("BEP20USDT", "USDT", 1000000, 18, "0x0000000000000000000000000000000000000000");
 
     await token.waitForDeployment();
 
