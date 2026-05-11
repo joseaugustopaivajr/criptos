@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UsdtFlash Pro Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-bolt logo-icon"></i>
+                <h2>UsdtFlash <span>Pro</span></h2>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </li>
+                <li class="nav-item" data-tab="generator">
+                    <i class="fas fa-plus-circle"></i> Gerador de Tokens
+                </li>
+                <li class="nav-item" data-tab="liquidity">
+                    <i class="fas fa-water"></i> Liquidez
+                </li>
+                <li id="nav-admin" class="nav-item hidden" data-tab="admin">
+                    <i class="fas fa-user-shield"></i> Admin Panel
+                </li>
+                <li class="nav-item" data-tab="settings">
+                    <i class="fas fa-cog"></i> Configurações
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="connect-button" class="btn-connect">
+                    <i class="fas fa-wallet"></i> <span>Conectar Carteira</span>
+                </button>
+                <div id="wallet-info" class="hidden">
+                    <p class="addr-label">Conectado como:</p>
+                    <p id="wallet-address-display">0x00...000</p>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tab: Dashboard -->
+            <section id="dashboard" class="tab-content active">
+                <header class="section-header">
+                    <h1>Dashboard Financeiro</h1>
+                    <p>Gerencie seus ativos <span id="display-token-name">UsdtFlash</span> (<span id="display-token-symbol">USDT</span>) em redes Multi-Chain</p>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card balance-card">
+                        <div class="card-icon" id="token-logo-container">
+                            <i class="fas fa-coins" id="token-logo-default"></i>
+                            <img id="token-logo-img" src="" class="hidden" alt="Token Logo">
+                        </div>
+                        <div class="card-info">
+                            <label>Seu Saldo Total</label>
+                            <h2 id="token-balance">0.00 USDT</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card check-balance-card">
+                        <div class="card-icon"><i class="fas fa-search-dollar"></i></div>
+                        <div class="card-info">
+                            <label>Consultar Saldo Externo</label>
+                            <div class="check-balance-input">
+                                <input type="text" id="check-address" placeholder="0x..." class="small-input">
+                                <button id="check-balance-btn" class="btn-icon"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card network-card">
+                        <div class="card-icon"><i class="fas fa-network-wired"></i></div>
+                        <div class="card-info">
+                            <label>Selecionar Rede</label>
+                            <select id="network-selector" class="network-select">
+                                <option value="local">Localhost (Hardhat)</option>
+                                <option value="bsc">BNB Smart Chain</option>
+                                <option value="eth">Ethereum Mainnet</option>
+                                <option value="sepolia">Sepolia Testnet</option>
+                                <option value="tron">Tron Mainnet</option>
+                                <option value="shasta">Tron Shasta Testnet</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions">
+                    <div class="action-panel transfer-panel">
+                        <h3><i class="fas fa-paper-plane"></i> Enviar Tokens</h3>
+                        <div class="form-group">
+                            <label>Endereço do Destinatário (Qualquer Carteira)</label>
+                            <input type="text" id="recipient-address" placeholder="0x...">
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade</label>
+                            <div class="input-with-button">
+                                <input type="number" id="transfer-amount" placeholder="0.00" step="0.000001">
+                                <button id="max-amount-btn" class="btn-small">MÁX</button>
+                            </div>
+                        </div>
+                        <button id="send-button" class="btn-primary">Enviar Agora</button>
+                    </div>
+
+                    <div class="action-panel info-panel">
+                        <h3><i class="fas fa-info-circle"></i> Informações do Contrato</h3>
+                        <div class="contract-info-box">
+                            <p class="label">Token Principal:</p>
+                            <div class="copy-box">
+                                <input type="text" id="contract-address" readonly>
+                                <button id="copy-contract" title="Copiar Endereço"><i class="fas fa-copy"></i></button>
+                            </div>
+                        </div>
+                        <div class="kit-actions">
+                            <button id="copy-kit" class="btn-outline">
+                                <i class="fas fa-share-alt"></i> Copiar Kit para Destinatário
+                            </button>
+                            <button id="add-metamask" class="btn-outline">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Mirror.svg" width="16" alt="MetaMask"> Adicionar ao MetaMask
+                            </button>
+                        </div>
+                        <div class="warning-box mini" style="margin-top: 15px; background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; padding: 10px; border-radius: 4px; font-size: 0.85rem;">
+                            <i class="fas fa-shield-alt" style="color: #ffc107;"></i>
+                            <p style="margin: 0; color: #ddd;"><strong style="color: #ffc107;">Aviso MetaMask:</strong> Se aparecer "Token Suspeito", é porque o símbolo <b id="warning-token-symbol">USDT</b> é reservado. Para remover, você deve verificar o contrato no BscScan/Etherscan.</p>
+                        </div>
+                        <div class="status-container">
+                            <p id="status-message"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Generator -->
+            <section id="generator" class="tab-content">
+                <header class="section-header">
+                    <h1>Gerador de Novos Tokens</h1>
+                    <p>Crie sua própria criptomoeda personalizada em segundos</p>
+                </header>
+
+                <div class="generator-container">
+                    <div class="info-banner multi-chain-info">
+                        <i class="fas fa-network-wired"></i>
+                        <div>
+                            <strong>Deploy Multi-Rede:</strong> Cada rede (BNB, ETH, TRC20) é independente. 
+                            Você deve realizar o deploy separadamente em cada uma para que seu token exista lá. 
+                            O endereço gerado será exclusivo para a rede selecionada no dropdown acima.
+                        </div>
+                    </div>
+                    <div class="info-banner mirror-info" style="margin-bottom: 20px; background: rgba(52, 152, 219, 0.1); border-left: 4px solid #3498db; padding: 15px; border-radius: 4px;">
+                        <i class="fas fa-copy" style="color: #3498db; margin-right: 15px; font-size: 1.2rem;"></i>
+                        <div>
+                            <strong style="color: #3498db; display: block; margin-bottom: 5px;">Contrato Espelho Profissional:</strong>
+                            <p style="margin: 0; font-size: 0.9rem; color: #ddd;">Seu token terá as mesmas funcionalidades de controle do USDT original (Tether):</p>
+                            <ul style="margin: 5px 0 0 20px; font-size: 0.85rem; color: #bbb;">
+                                <li><b>Controle de Blacklist:</b> Bloqueie carteiras suspeitas de transacionar.</li>
+                                <li><b>Pausa de Emergência:</b> Interrompa transferências globalmente quando necessário.</li>
+                                <li><b>Queima (Burn):</b> Remova tokens de circulação para valorização.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="generator-form">
+                        <div class="gas-info-badge" id="gas-info">
+                            <i class="fas fa-gas-pump"></i> Taxa de Gás estimada em: <strong id="gas-currency">ETH</strong>
+                        </div>
+                        <div id="tron-gas-warning" class="info-banner hidden" style="margin-top: 10px; background: rgba(231, 76, 60, 0.1); border-left: 4px solid #e74c3c; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #ff7675;">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Aviso Tron:</strong> Deploys nesta rede consomem entre 50 a 100 TRX (ou Energy). Certifique-se de ter saldo suficiente.
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome do Token</label>
+                                <input type="text" id="gen-name" placeholder="Ex: My Flash Token">
+                            </div>
+                            <div class="form-group">
+                                <label>Símbolo (Ticker)</label>
+                                <input type="text" id="gen-symbol" placeholder="Ex: MFT">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Suprimento Inicial</label>
+                                <input type="number" id="gen-supply" placeholder="Ex: 1000000">
+                            </div>
+                            <div class="form-group">
+                                <label>Decimais</label>
+                                <input type="number" id="gen-decimals" value="18">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Imagem do Token (Anexar ou URL)</label>
+                            <div class="image-input-row">
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="gen-image-file" accept="image/*" class="file-input-hidden">
+                                    <button type="button" onclick="document.getElementById('gen-image-file').click()" class="btn-outline btn-small">
+                                        <i class="fas fa-upload"></i> Anexar Foto
+                                    </button>
+                                    <span id="gen-file-name" class="tip-small">Nenhum arquivo...</span>
+                                </div>
+                                <input type="text" id="gen-image" placeholder="Ou cole a URL da imagem...">
+                            </div>
+                            <p class="tip-small"><i class="fas fa-info-circle"></i> Imagens anexadas funcionam no Dashboard. Para visibilidade global no MetaMask, prefira uma URL pública.</p>
+                        </div>
+                        <button id="deploy-token-button" class="btn-secondary">
+                            <i class="fas fa-rocket"></i> Gerar Novo Token
+                        </button>
+                    </div>
+
+                    <div id="deployment-result" class="hidden">
+                        <h3><i class="fas fa-check-circle"></i> Token Gerado com Sucesso!</h3>
+                        <div class="result-details">
+                            <p><strong>Endereço do Contrato:</strong> <span id="new-token-address">...</span></p>
+                            <p><strong>Enviado para:</strong> <span id="new-token-owner" style="font-size: 0.85rem; color: #f1c40f;">...</span></p>
+                            <p id="tron-deploy-tip" class="tip-small hidden" style="color: #3498db; margin-top: -10px; margin-bottom: 10px;">
+                                <i class="fas fa-info-circle"></i> Sim! Os tokens já estão na sua carteira. Basta copiar o endereço acima e importar no TronLink para vê-los.
+                            </p>
+                            <p><strong>Hash da Transação:</strong> <span id="new-token-hash">...</span></p>
+                            <div class="result-actions">
+                                <button id="use-this-token" class="btn-primary btn-small">Usar no Dashboard</button>
+                                <button id="copy-new-token" class="btn-small">Copiar Endereço</button>
+                                <button id="copy-new-kit" class="btn-small">Kit de Importação</button>
+                                <button id="add-new-metamask" class="btn-small">Adicionar ao MetaMask</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Liquidity -->
+            <section id="liquidity" class="tab-content">
+                <header class="section-header">
+                    <h1>Gestão de Liquidez</h1>
+                    <p>Dê valor ao seu token criando um Pool de Liquidez em Exchanges Descentralizadas (DEX)</p>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="card-icon"><i class="fas fa-university"></i></div>
+                        <div class="card-info">
+                            <label>Exchange Recomendada</label>
+                            <h3 id="dex-name">PancakeSwap</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="card-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="card-info">
+                            <label>Par Sugerido</label>
+                            <h3 id="liquidity-pair">USDT / BNB</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-panel">
+                    <h3><i class="fas fa-rocket"></i> Como adicionar liquidez?</h3>
+                    <div class="liquidity-guide">
+                        <ol class="step-list">
+                            <li><strong>Escolha uma DEX:</strong> Para BNB use PancakeSwap, para Ethereum use Uniswap.</li>
+                            <li><strong>Acesse a função Pool:</strong> Clique em "Add Liquidity" ou "V3 Liquidity".</li>
+                            <li><strong>Selecione os Tokens:</strong> Insira o contrato do seu token e escolha uma moeda estável (USDT/USDC) ou a moeda nativa (BNB/ETH).</li>
+                            <li><strong>Defina o Preço Inicial:</strong> A proporção que você depositar define o preço. (Ex: 1000 Tokens + 1000 USDT = $1.00 por token).</li>
+                            <li><strong>Aprovar e Confirmar:</strong> Você receberá tokens LP que representam sua parte na piscina de liquidez.</li>
+                        </ol>
+                    </div>
+                    <div class="liquidity-actions">
+                        <a id="dex-link" href="https://pancakeswap.finance/add" target="_blank" class="btn-primary btn-full text-center" style="display: block; text-decoration: none; margin-top: 20px;">
+                            <i class="fas fa-external-link-alt"></i> Abrir Exchange para Adicionar Liquidez
+                        </a>
+                    </div>
+
+                    <div class="simulator-panel" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                        <h3><i class="fas fa-calculator"></i> Simulador de Valor Monetário</h3>
+                        <p style="font-size: 0.9rem; color: #bbb; margin-bottom: 20px;">Calcule quanto de liquidez você precisa para definir o preço inicial do seu token.</p>
+                        
+                        <div class="simulator-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label>Quantidade de Tokens</label>
+                                <input type="number" id="sim-tokens" value="1000" class="input-full">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor em Dinheiro (USD)</label>
+                                <input type="number" id="sim-usd" value="1000" class="input-full">
+                            </div>
+                        </div>
+                        
+                        <div class="sim-result-card" style="background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
+                            <label style="display: block; color: #2ecc71; margin-bottom: 5px; font-weight: bold;">Preço Inicial Estimado</label>
+                            <h2 style="margin: 0; color: #fff;">$ <span id="sim-price-result">1.00</span> <small style="font-size: 0.9rem; color: #888;">por token</small></h2>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="admin" class="tab-content">
+                <header class="section-header">
+                    <h1>Painel Administrativo</h1>
+                    <p>Controles de segurança para o token <span class="active-token-name">...</span></p>
+                </header>
+
+                <div class="admin-grid">
+                    <!-- Card: Pausa -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-pause-circle"></i>
+                            <h3>Pausa de Emergência</h3>
+                        </div>
+                        <div class="admin-card-body">
+                            <p>Interrompe todas as transferências do token globalmente.</p>
+                            <div class="status-badge" id="pause-status-badge">
+                                <span>Status:</span> <strong id="pause-status-text">Ativo</strong>
+                            </div>
+                            <button id="toggle-pause-btn" class="btn-warning btn-full">
+                                <i class="fas fa-pause"></i> Pausar Contrato
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Blacklist -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>Gerenciar Blacklist</h3>
+                        </div>
+                        <div class="admin-card-body">
+                            <p>Bloqueie endereços de enviar ou receber tokens.</p>
+                            <div class="form-group">
+                                <input type="text" id="blacklist-address" placeholder="0x..." class="admin-input">
+                                <div class="admin-actions-row">
+                                    <button id="add-blacklist-btn" class="btn-danger btn-small">Bloquear</button>
+                                    <button id="remove-blacklist-btn" class="btn-outline btn-small">Desbloquear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Recuperação -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-fire"></i>
+                            <h3>Recuperação de Fundos</h3>
+                        </div>
+                        <div class="admin-card-body">
+                            <p>Destrói permanentemente os tokens de uma carteira na blacklist.</p>
+                            <div class="form-group">
+                                <input type="text" id="burn-blacklist-address" placeholder="0x..." class="admin-input">
+                                <button id="destroy-funds-btn" class="btn-danger btn-full">Destruir Fundos</button>
+                            </div>
+                            <p class="tip-small text-danger"><i class="fas fa-exclamation-triangle"></i> Esta ação é irreversível.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Settings -->
+            <section id="settings" class="tab-content">
+                <header class="section-header">
+                    <h1>Configurações do Painel</h1>
+                </header>
+                <div class="settings-panel">
+                    <div class="form-group">
+                        <label>Contrato USDT Principal</label>
+                        <div class="input-with-button">
+                            <input type="text" id="settings-contract-address" placeholder="0x...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagem do Token Principal (Anexar ou URL)</label>
+                        <div class="image-input-row">
+                            <div class="file-input-wrapper">
+                                <input type="file" id="settings-image-file" accept="image/*" class="file-input-hidden">
+                                <button type="button" onclick="document.getElementById('settings-image-file').click()" class="btn-outline btn-small">
+                                    <i class="fas fa-upload"></i> Anexar Foto
+                                </button>
+                                <span id="settings-file-name" class="tip-small">Nenhum arquivo...</span>
+                            </div>
+                            <input type="text" id="settings-token-image" placeholder="Ou cole a URL da imagem...">
+                        </div>
+                        <p class="tip-small"><i class="fas fa-info-circle"></i> Imagens anexadas funcionam localmente. Para o MetaMask, use URLs públicas (como GitHub ou Imgur).</p>
+                    </div>
+                    <div class="form-group">
+                        <label>TronGrid API Key (Opcional)</label>
+                        <input type="text" id="settings-tron-api-key" placeholder="Insira sua API Key da TronGrid">
+                        <p class="tip-small"><i class="fas fa-info-circle"></i> Recomendado para evitar erros de 'Rate Limit' na rede Tron.</p>
+                    </div>
+                    <button id="save-contract" class="btn-primary btn-full" style="margin-bottom: 20px;">Salvar Configurações</button>
+                    <div class="deployment-help-box">
+                        <h3><i class="fas fa-rocket"></i> Quer usar seu contrato em outra rede?</h3>
+                        <p>Para usar o UsdtFlash no Ethereum ou BNB, você precisa primeiro "publicar" (fazer o deploy) do contrato nessa rede.</p>
+                        <button onclick="prefillGenerator()" class="btn-outline btn-full">
+                            Fazer Deploy do UsdtFlash nesta rede
+                        </button>
+                        <p class="tip-small"><i class="fas fa-info-circle"></i> Você precisará de saldo (ETH ou BNB) para pagar a taxa de gás da rede.</p>
+                    </div>
+                    <p class="tip">Nota: O contrato principal pode ser alterado nas configurações.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.0/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tronweb@latest/dist/TronWeb.js"></script>
+    <script src="app.js"></script>
+    <div id="toast-container"></div>
+</body>
+</html>
