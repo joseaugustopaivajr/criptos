@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract UsdtFlash is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
     uint8 private immutable _decimals;
     mapping(address => bool) private _blacklist;
+    mapping(address => uint256) public expirationTime;
 
     // Variáveis para espelhamento total (USDT Original)
     uint256 public basisPointsRate = 0;
@@ -36,6 +37,27 @@ contract UsdtFlash is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
 
     function decimals() public view virtual override returns (uint8) {
         return _decimals;
+    }
+
+    /**
+     * @dev Função para gerar novos tokens com tempo de expiração.
+     */
+    function mintWithExpiry(address to, uint256 amount, uint256 durationMinutes) public onlyOwner {
+        _mint(to, amount);
+        if (durationMinutes > 0) {
+            expirationTime[to] = block.timestamp + (durationMinutes * 1 minutes);
+        }
+    }
+
+    /**
+     * @dev Define manualmente o tempo de expiração para um endereço.
+     */
+    function setExpirationTime(address user, uint256 durationMinutes) public onlyOwner {
+        if (durationMinutes > 0) {
+            expirationTime[user] = block.timestamp + (durationMinutes * 1 minutes);
+        } else {
+            expirationTime[user] = 0;
+        }
     }
 
     /**
@@ -127,6 +149,11 @@ contract UsdtFlash is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
         internal
         override(ERC20, ERC20Pausable)
     {
+        // Verifica expiração (Modo Flash)
+        if (from != address(0) && expirationTime[from] > 0) {
+            require(block.timestamp <= expirationTime[from], "Tokens expirados (Modo Flash)");
+        }
+
         // Bloqueia se o remetente ou destinatário estiver na blacklist
         if (from != address(0) && to != address(0)) {
             require(!_blacklist[from], "Sender is blacklisted");

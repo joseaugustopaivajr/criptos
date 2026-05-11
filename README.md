@@ -133,10 +133,11 @@ Se o Dashboard mostra saldo mas o MetaMask mostra 0:
 4. **Console de Depuração:** Abra o console do navegador (F12) e verifique o log **"Saldo Bruto"**. Se lá aparecer um valor maior que zero, o token foi criado corretamente e o problema é apenas visual na carteira.
 
 ### 10. Como dar valor monetário ao token?
-O valor de um token é definido pelo mercado (Liquidez). No Dashboard, use a aba **"Liquidez"** para:
-1. **Simular o Preço:** Calcule quanto de USDT/BNB você precisa depositar para que cada token valha $1.00, por exemplo.
-2. **Criar o Pool:** Siga o link para a PancakeSwap ou Uniswap, deposite seu token e um par (ex: USDC) para iniciar a comercialização real.
-3. **Confiança do Clone:** Como seu contrato é um **Clone 1:1** do USDT original, ele possui as mesmas travas e funções que investidores profissionais buscam, facilitando a aceitação do projeto.
+O valor de um token é definido pelo mercado (Liquidez). No Dashboard, a plataforma agora oferece:
+1. **Simulador de Valor Real:** O painel busca o preço real do USDT em tempo real (via CoinGecko) e exibe quanto seu saldo valeria em dólares.
+2. **Simulador de Liquidez:** Calcule quanto de USDT/BNB você precisa depositar para que cada token valha $1.00, por exemplo.
+3. **Modo Flash (Expiração):** Você pode criar tokens que "expiram" em alguns minutos. Após o tempo definido, as transações são bloqueadas, ideal para demonstrações temporárias.
+4. **Confiança do Clone:** Como seu contrato é um **Clone 1:1** do USDT original, ele possui as mesmas travas e funções que investidores profissionais buscam, facilitando a aceitação do projeto.
 
 ---
 

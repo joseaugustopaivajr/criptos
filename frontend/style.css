@@ -635,6 +635,22 @@ input, select {
     border-radius: 50%;
 }
 
+#token-value-usd {
+    background: rgba(46, 204, 113, 0.1);
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.text-warning {
+    color: #f1c40f !important;
+}
+
+.tip-small i {
+    margin-right: 5px;
+}
+
 .card-icon {
     display: flex;
     align-items: center;

