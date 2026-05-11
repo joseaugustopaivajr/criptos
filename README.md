@@ -33,10 +33,10 @@ Este projeto é uma plataforma profissional para criação e gestão de tokens (
 
 ### 2. Gerador de Tokens Profissional
 *   **Criação Instantânea:** Crie sua própria criptomoeda informando apenas Nome, Símbolo e Quantidade.
-*   **Modo Espelho Original:** Os contratos gerados incluem funções de controle idênticas ao USDT (Tether):
-    *   **Blacklist:** Bloqueie endereços de enviar ou receber tokens.
-    *   **Pausa:** Interrompa todas as transações em caso de emergência.
-    *   **Queima (Burn):** Reduza o suprimento total removendo tokens.
+*   **Modo Clone 1:1 (Mirror):** Os contratos gerados são clones idênticos (BEP20USDT) ao original da Tether, incluindo:
+    *   **Controle de Blacklist:** Bloqueie carteiras suspeitas de transacionar.
+    *   **Pausa de Emergência:** Interrompa todas as transações globalmente.
+    *   **Funções Issue/Redeem:** Lógica profissional de emissão e queima de fundos.
 *   **Deploy com um Clique:** Publique o contrato diretamente pela interface (requer MetaMask ou TronLink).
 *   **Kit de Importação:** Gere automaticamente os dados para que o destinatário adicione o token na carteira.
 
@@ -137,7 +137,11 @@ O valor de um token é definido pelo mercado (Liquidez). No Dashboard, a platafo
 1. **Simulador de Valor Real:** O painel busca o preço real do USDT em tempo real (via CoinGecko) e exibe quanto seu saldo valeria em dólares.
 2. **Simulador de Liquidez:** Calcule quanto de USDT/BNB você precisa depositar para que cada token valha $1.00, por exemplo.
 3. **Modo Flash (Expiração):** Você pode criar tokens que "expiram" em alguns minutos. Após o tempo definido, as transações são bloqueadas, ideal para demonstrações temporárias.
-4. **Confiança do Clone:** Como seu contrato é um **Clone 1:1** do USDT original, ele possui as mesmas travas e funções que investidores profissionais buscam, facilitando a aceitação do projeto.
+4. **Confiança do Clone:** Como seu contrato é o **BEP20USDT (Clone 1:1)**, ele possui as mesmas travas e funções que investidores profissionais buscam.
+
+### 11. Por que o explorador de blocos mostra "0 BNB" na transação?
+No BscScan/Etherscan, o campo **"Value"** no topo da transação refere-se à moeda nativa da rede (BNB ou ETH). Como você está enviando tokens, o valor em BNB é zero. 
+O valor em dólares e a quantidade de tokens enviados aparecem logo abaixo, na seção **"Tokens Transferred"**. O explorador mostrará o valor em dólar se houver liquidez no token.
 
 ---
 

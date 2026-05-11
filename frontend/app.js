@@ -6,7 +6,7 @@ let mainContract;
 let tronContract;
 let contractABI;
 let contractBytecode;
-let mainTokenName = "UsdtFlash";
+let mainTokenName = "BEP20USDT";
 let mainTokenSymbol = "USDT";
 let mainTokenDecimals = 18;
 let mainTokenImage = "";
@@ -1036,6 +1036,10 @@ async function deployNewToken() {
         document.getElementById('new-token-address').innerText = newAddress;
         document.getElementById('new-token-owner').innerText = await currentSigner.getAddress();
         document.getElementById('new-token-hash').innerText = txHash.substring(0, 20) + "...";
+        
+        // Link para o explorador
+        const explorerBase = NETWORKS[netKey]?.explorer || "https://bscscan.com/tx/";
+        document.getElementById('new-token-hash').innerHTML = `<a href="${explorerBase}${txHash}" target="_blank" style="color: #3498db;">${txHash.substring(0, 20)}... <i class="fas fa-external-link-alt"></i></a>`;
 
         // Verifica saldo do novo token para feedback imediato
         try {
@@ -1067,17 +1071,21 @@ async function deployNewToken() {
 function prefillGenerator() {
     const netKey = networkSelector.value;
     if (netKey === 'bsc') {
-        document.getElementById('gen-name').value = "Tether USD";
-        document.getElementById('gen-symbol').value = "USDT";
+        document.getElementById('gen-name').value = "Binance-Peg BSC-USD";
+        document.getElementById('gen-symbol').value = "BSC-USD";
+        document.getElementById('gen-decimals').value = "18";
     } else if (netKey === 'eth') {
         document.getElementById('gen-name').value = "Tether USD";
         document.getElementById('gen-symbol').value = "USDT";
+        document.getElementById('gen-decimals').value = "18";
     } else if (isTron(netKey)) {
         document.getElementById('gen-name').value = "Tether USD";
         document.getElementById('gen-symbol').value = "USDT";
+        document.getElementById('gen-decimals').value = "6";
     } else {
-        document.getElementById('gen-name').value = "Tether USD";
+        document.getElementById('gen-name').value = "BEP20USDT";
         document.getElementById('gen-symbol').value = "USDT";
+        document.getElementById('gen-decimals').value = "18";
     }
     
     document.getElementById('gen-supply').value = "1000000";

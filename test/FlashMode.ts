@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { network } from "hardhat";
 
-describe("UsdtFlash - Modo Flash (Expiração)", function () {
+describe("BEP20USDT - Modo Flash (Expiração)", function () {
   let token: any;
   let owner: any;
   let user1: any;
@@ -15,7 +15,7 @@ describe("UsdtFlash - Modo Flash (Expiração)", function () {
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
-    const Token = await ethers.getContractFactory("UsdtFlash");
+    const Token = await ethers.getContractFactory("BEP20USDT");
     token = await Token.deploy("Tether USD", "USDT", 1000000, 18);
     await token.waitForDeployment();
   });

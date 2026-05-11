@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { network } from "hardhat";
 
-describe("UsdtFlash - Modo Espelho (Blacklist & Pausa)", function () {
+describe("BEP20USDT - Modo Espelho (Blacklist & Pausa)", function () {
   let token: any;
   let owner: any;
   let user1: any;
@@ -15,8 +15,8 @@ describe("UsdtFlash - Modo Espelho (Blacklist & Pausa)", function () {
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
-    const Token = await ethers.getContractFactory("UsdtFlash");
-    token = await Token.deploy("UsdtFlash", "USDT", 1000000, 18);
+    const Token = await ethers.getContractFactory("BEP20USDT");
+    token = await Token.deploy("BEP20USDT", "USDT", 1000000, 18);
     await token.waitForDeployment();
   });
 

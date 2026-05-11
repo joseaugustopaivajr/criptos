@@ -16,10 +16,10 @@ async function main() {
     console.log(`Total de carteiras detectadas: ${signers.length}`);
 
     const Token =
-        await ethers.getContractFactory("UsdtFlash");
+        await ethers.getContractFactory("BEP20USDT");
 
     const token =
-        await Token.deploy("UsdtFlash", "USDT", 1000000, 18);
+        await Token.deploy("BEP20USDT", "USDT", 1000000, 18);
 
     await token.waitForDeployment();
 
@@ -30,7 +30,7 @@ async function main() {
 
     // Salva o endereço, as contas e o artefato para o frontend ler automaticamente
     const frontendDir = path.join(__dirname, "../frontend");
-    const artifactPath = path.join(__dirname, "../artifacts/contracts/UsdtFlash.sol/UsdtFlash.json");
+    const artifactPath = path.join(__dirname, "../artifacts/contracts/BEP20USDT.sol/BEP20USDT.json");
     const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
 
     fs.writeFileSync(

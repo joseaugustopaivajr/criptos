@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const RPC_PORT = 8545;
 const RPC_HOST = '127.0.0.1';
 
-console.log("🚀 Iniciando ambiente UsdtFlash...");
+console.log("🚀 Iniciando ambiente BEP20USDT...");
 
 // 1. Iniciar o Nó Hardhat
 const node = spawn('npx', ['hardhat', 'node'], { 
@@ -68,7 +68,7 @@ async function start() {
         process.exit(1);
     }
 
-    console.log("📦 Fazendo deploy do contrato UsdtFlash...");
+    console.log("📦 Fazendo deploy do contrato BEP20USDT...");
     
     const deploy = spawn('npx', ['hardhat', 'run', 'scripts/deploy.ts', '--network', 'localhost'], { 
         shell: true, 

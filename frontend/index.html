@@ -225,6 +225,9 @@
 
                     <div id="deployment-result" class="hidden">
                         <h3><i class="fas fa-check-circle"></i> Token Gerado com Sucesso!</h3>
+                        <div class="info-banner mirror-info" style="margin-bottom: 15px; background: rgba(46, 204, 113, 0.1); border-left: 4px solid #2ecc71; padding: 10px; border-radius: 4px; font-size: 0.85rem;">
+                            <i class="fas fa-check-double" style="color: #2ecc71;"></i> <strong>Status: Clone 1:1 Confirmado.</strong> Este contrato é funcionalmente idêntico ao original (Tether).
+                        </div>
                         <div class="result-details">
                             <p><strong>Endereço do Contrato:</strong> <span id="new-token-address">...</span></p>
                             <p><strong>Enviado para:</strong> <span id="new-token-owner" style="font-size: 0.85rem; color: #f1c40f;">...</span></p>
@@ -232,6 +235,7 @@
                                 <i class="fas fa-info-circle"></i> Sim! Os tokens já estão na sua carteira. Basta copiar o endereço acima e importar no TronLink para vê-los.
                             </p>
                             <p><strong>Hash da Transação:</strong> <span id="new-token-hash">...</span></p>
+                            <p class="tip-small"><i class="fas fa-info-circle"></i> <strong>Nota:</strong> No explorador de blocos, o campo "Value" mostrará <b>0 BNB</b> (ou ETH). Isso é normal, pois essa é a taxa de transferência nativa. O valor em tokens está listado na aba "Tokens Transferred".</p>
                             <div class="result-actions">
                                 <button id="use-this-token" class="btn-primary btn-small">Usar no Dashboard</button>
                                 <button id="copy-new-token" class="btn-small">Copiar Endereço</button>

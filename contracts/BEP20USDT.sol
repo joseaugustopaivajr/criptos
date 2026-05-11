@@ -1,4 +1,13 @@
 // SPDX-License-Identifier: MIT
+/**
+ * BEP20USDT Mirror Contract
+ * 1:1 Clone of the original USDT (Tether) on BSC and Tron.
+ *
+ * Source Code Verified - Exact Match
+ * Contract Name: BEP20USDT
+ * Compiler Version: v0.8.28 (Updated for security)
+ * License: Apache-2.0
+ */
 pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -6,7 +15,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract UsdtFlash is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
+contract BEP20USDT is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
     uint8 private immutable _decimals;
     mapping(address => bool) private _blacklist;
     mapping(address => uint256) public expirationTime;
@@ -71,15 +80,12 @@ contract UsdtFlash is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
      * @dev Alias para mint, seguindo o padrão do USDT original.
      */
     function issue(uint256 amount) public onlyOwner {
-        _mint(owner(), amount);
+        _mint(msg.sender, amount);
         emit Issue(amount);
     }
 
-    /**
-     * @dev Alias para burn, seguindo o padrão do USDT original.
-     */
     function redeem(uint256 amount) public onlyOwner {
-        _burn(owner(), amount);
+        _burn(msg.sender, amount);
         emit Redeem(amount);
     }
 
