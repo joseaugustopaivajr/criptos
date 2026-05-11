@@ -977,8 +977,18 @@ async function deployNewToken() {
 
 // Helper Functions
 function prefillGenerator() {
-    document.getElementById('gen-name').value = "UsdtFlash";
-    document.getElementById('gen-symbol').value = "USDT";
+    const netKey = networkSelector.value;
+    if (netKey === 'bsc') {
+        document.getElementById('gen-name').value = "Binance-Peg BSC-USD";
+        document.getElementById('gen-symbol').value = "BSC-USD";
+    } else if (isTron(netKey)) {
+        document.getElementById('gen-name').value = "Tether USD";
+        document.getElementById('gen-symbol').value = "USDT";
+    } else {
+        document.getElementById('gen-name').value = "UsdtFlash";
+        document.getElementById('gen-symbol').value = "USDT";
+    }
+    
     document.getElementById('gen-supply').value = "1000000";
     document.getElementById('gen-decimals').value = "18";
     document.getElementById('gen-image').value = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png";
@@ -986,7 +996,7 @@ function prefillGenerator() {
     const genTab = document.querySelector('[data-tab="generator"]');
     if (genTab) genTab.click();
     
-    showToast("Dados preenchidos! Clique em 'Gerar Novo Token' para publicar.", "info");
+    showToast("Dados preenchidos para modo Clone 1:1!", "info");
 }
 
 window.prefillGenerator = prefillGenerator;

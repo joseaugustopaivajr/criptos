@@ -92,9 +92,9 @@ describe("UsdtFlash - Modo Espelho (Blacklist & Pausa)", function () {
       // Max fee em units reais para o teste (50 * 10^18)
       // Ajustando o contrato para permitir taxas maiores se necessário, 
       // mas mantendo o limite do USDT original para o clone.
-      await token.setParams(20, 50); 
+      await token.setParams(20, 1000); 
       
-      const transferAmount = 100000n; // Valor pequeno para não bater no max fee de 50 units
+      const transferAmount = 100000n; // Valor pequeno para não bater no max fee de 1000 units
       const expectedFee = (transferAmount * 20n) / 10000n; // 200 units
       
       const initialOwnerBalance = await token.balanceOf(owner.address);

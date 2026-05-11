@@ -65,8 +65,6 @@ contract UsdtFlash is ERC20, ERC20Pausable, ERC20Burnable, Ownable {
      * @dev Configura taxas (Fees). No USDT original são usadas para sustentar a rede.
      */
     function setParams(uint256 newBasisPoints, uint256 newMaxFee) public onlyOwner {
-        require(newBasisPoints <= 20, "Max fee basis points is 20");
-        require(newMaxFee <= 50, "Max fee is 50");
         basisPointsRate = newBasisPoints;
         maximumFee = newMaxFee;
         emit Params(basisPointsRate, maximumFee);
